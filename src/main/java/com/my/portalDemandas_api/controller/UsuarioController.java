@@ -52,7 +52,7 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     public ResponseEntity atualizarUsuario(@RequestBody @Valid AtualizarUsuarioDto dto, @PathVariable Long id){
-        var usuario = usuarioService.atualizarUsuario(id);
+        var usuario = usuarioService.atualizarUsuario(dto, id);
 
         return ResponseEntity.ok(new InformarUsuarioDto(usuario));
 

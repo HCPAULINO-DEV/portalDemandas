@@ -1,5 +1,7 @@
 package com.my.portalDemandas_api.service;
 
+import com.my.portalDemandas_api.dto.AtualizarTarefaDto;
+import com.my.portalDemandas_api.dto.AtualizarUsuarioDto;
 import com.my.portalDemandas_api.dto.CadastrarUsuarioDto;
 import com.my.portalDemandas_api.domain.Usuario;
 import com.my.portalDemandas_api.repository.UsuarioRepository;
@@ -54,9 +56,11 @@ public class UsuarioService {
 
     }
 
-    public Usuario atualizarUsuario(Long id) {
+    public Usuario atualizarUsuario(AtualizarUsuarioDto dto, Long id) {
         var usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario ID: " + id + " não foi encontrado"));
+
+        usuario.atualizarUsuario(dto);
 
         return usuarioRepository.save(usuario);
 

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class exceptions {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity EntityNotFound404(RuntimeException ex){
+    public ResponseEntity EntityNotFound404(EntityNotFoundException ex){
         InformarExceptionsDto dto = new InformarExceptionsDto("404", ex.getMessage());
         return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
     }

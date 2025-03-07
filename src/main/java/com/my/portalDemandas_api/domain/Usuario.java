@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "usuario")
 @AllArgsConstructor
@@ -21,6 +24,9 @@ public class Usuario {
     private String email;
     private String password;
     private Tipo tipo;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tarefa> tarefas = new ArrayList<>();
 
     public Usuario(CadastrarUsuarioDto dto){
         this.nome = dto.nome();
