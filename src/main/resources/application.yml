@@ -1,0 +1,24 @@
+server:
+  port: 8086
+  error:
+    include-stacktrace: never
+
+spring:
+  application:
+    name: portalDemandas_api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/portalDemandas
+    username: postgres
+    password: postgress
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+      show-sql: true
+
+#api:
+#  security:
+#    token:
+#      secret: ${JWT_SECRET:123}
