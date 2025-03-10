@@ -4,26 +4,34 @@ import com.my.portalDemandas_api.dto.AtualizarTarefaDto;
 import com.my.portalDemandas_api.dto.AtualizarUsuarioDto;
 import com.my.portalDemandas_api.dto.CadastrarUsuarioDto;
 import com.my.portalDemandas_api.domain.Usuario;
+import com.my.portalDemandas_api.infra.validations.ValidadorUsuario;
 import com.my.portalDemandas_api.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jdk.dynalink.linker.LinkerServices;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UsuarioService {
 
+    private final List<ValidadorUsuario> validadores;
+
     private final UsuarioRepository usuarioRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(List<ValidadorUsuario> validadores, UsuarioRepository usuarioRepository) {
+        this.validadores = validadores;
         this.usuarioRepository = usuarioRepository;
-
     }
 
     @Transactional
-    public Usuario salvarUsuario(CadastrarUsuarioDto dto) {
-        Usuario usuario = new Usuario(dto);
+    public Usuario salvarUsuario(CadastrarUsuarioDto dtoCadastrar) {
+        validadores.forEach(v -> v.validar(dtoCadastrar, null));
+        Usuario usuario = new Usuario(dtoCadastrar);
+
         return usuarioRepository.save(usuario);
 
     }
@@ -32,6 +40,10 @@ public class UsuarioService {
     public void deletarUsuario(Long id){
         var usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario ID: " + id + " não foi encontrado"));
+
+        if (!usuario.getTarefas().isEmpty()){
+            throw new EntityNotFoundException("O usuário possuí tarefas criadas por isso não será possível realizar a exclusão!");
+        }
 
         usuarioRepository.delete(usuario);
 
@@ -56,6 +68,7 @@ public class UsuarioService {
 
     }
 
+    @Transactional
     public Usuario atualizarUsuario(AtualizarUsuarioDto dto, Long id) {
         var usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario ID: " + id + " não foi encontrado"));

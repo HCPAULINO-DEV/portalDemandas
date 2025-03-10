@@ -10,7 +10,7 @@ public record AtualizarUsuarioDto(
         String nome,
 
         @NotBlank
-        @Email
+        @Email(message = "Insira um e-mail válido")
         String email,
 
         @NotBlank
