@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jdk.dynalink.linker.LinkerServices;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,18 +20,19 @@ import java.util.List;
 public class UsuarioService {
 
     private final List<ValidadorUsuario> validadores;
-
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(List<ValidadorUsuario> validadores, UsuarioRepository usuarioRepository) {
+    public UsuarioService(List<ValidadorUsuario> validadores, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.validadores = validadores;
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     public Usuario salvarUsuario(CadastrarUsuarioDto dtoCadastrar) {
         validadores.forEach(v -> v.validar(dtoCadastrar, null));
-        Usuario usuario = new Usuario(dtoCadastrar);
+        Usuario usuario = new Usuario(dtoCadastrar, passwordEncoder);
 
         return usuarioRepository.save(usuario);
 
@@ -74,7 +76,7 @@ public class UsuarioService {
         var usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario ID: " + id + " não foi encontrado"));
 
-        usuario.atualizarUsuario(dtoAtualizar);
+        usuario.atualizarUsuario(dtoAtualizar, passwordEncoder);
 
         return usuarioRepository.save(usuario);
 

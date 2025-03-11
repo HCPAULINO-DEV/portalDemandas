@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,15 +33,15 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarefa> tarefas = new ArrayList<>();
 
-    public Usuario(CadastrarUsuarioDto dto){
+    public Usuario(CadastrarUsuarioDto dto, PasswordEncoder passwordEncoder){
         this.nome = dto.nome();
         this.email = dto.email();
-        this.password = dto.password();
+        this.password = passwordEncoder.encode(dto.password());
         this.tipo = dto.tipo();
 
     }
 
-    public void atualizarUsuario(AtualizarUsuarioDto dto){
+    public void atualizarUsuario(AtualizarUsuarioDto dto, PasswordEncoder passwordEncoder){
         if (dto.nome() != null){
             this.nome = dto.nome();
         }
@@ -48,7 +49,7 @@ public class Usuario implements UserDetails {
             this.email = dto.email();
         }
         if (dto.password() != null){
-            this.password = dto.password();
+            this.password = passwordEncoder.encode(dto.password());
         }
         if (dto.tipo() != null){
             this.tipo = dto.tipo();
@@ -58,11 +59,11 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.tipo == Tipo.ADMIN) {
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        }
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + this.tipo.name());
+        System.out.println("Usuário autenticado com papel: " + authority.getAuthority()); // Depuração
+        return List.of(authority);
     }
+
 
     @Override
     public String getUsername() {
