@@ -69,11 +69,12 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario atualizarUsuario(AtualizarUsuarioDto dto, Long id) {
+    public Usuario atualizarUsuario(AtualizarUsuarioDto dtoAtualizar, Long id) {
+        validadores.forEach(v -> v.validar(null, dtoAtualizar));
         var usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario ID: " + id + " não foi encontrado"));
 
-        usuario.atualizarUsuario(dto);
+        usuario.atualizarUsuario(dtoAtualizar);
 
         return usuarioRepository.save(usuario);
 

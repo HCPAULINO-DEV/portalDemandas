@@ -10,7 +10,7 @@ public record CadastrarUsuarioDto(
          String nome,
 
          @NotBlank
-         @Email(message = "Insira um e-mail válido")
+         @Email(message = "E-mail inválido ou ")
          String email,
 
          @NotBlank

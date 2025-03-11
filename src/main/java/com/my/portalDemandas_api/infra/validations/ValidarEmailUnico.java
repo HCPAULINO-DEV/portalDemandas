@@ -16,9 +16,13 @@ public class ValidarEmailUnico implements ValidadorUsuario{
 
     @Override
     public void validar(CadastrarUsuarioDto dtoCadastrar, AtualizarUsuarioDto dtoAtualizar) {
-        if (usuarioRepository.existsByEmail(dtoCadastrar.email()) || usuarioRepository.existsByEmail(dtoAtualizar.email())){
+        if (dtoCadastrar != null && usuarioRepository.existsByEmail(dtoCadastrar.email())) {
             throw new IllegalArgumentException("E-mail já cadastrado");
+        }
 
+        // Verifica se o e-mail existe para a atualização, mas apenas se o DTO de atualização não for nulo
+        if (dtoAtualizar != null && usuarioRepository.existsByEmail(dtoAtualizar.email())) {
+            throw new IllegalArgumentException("E-mail já cadastrado");
         }
 
     }

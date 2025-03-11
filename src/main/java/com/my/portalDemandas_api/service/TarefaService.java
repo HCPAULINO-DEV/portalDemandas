@@ -4,33 +4,39 @@ import com.my.portalDemandas_api.domain.Tarefa;
 import com.my.portalDemandas_api.domain.Usuario;
 import com.my.portalDemandas_api.dto.AtualizarTarefaDto;
 import com.my.portalDemandas_api.dto.CadastrarTarefaDto;
+import com.my.portalDemandas_api.infra.validations.ValidadorTarefa;
 import com.my.portalDemandas_api.repository.TarefaRepository;
 import com.my.portalDemandas_api.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class TarefaService {
 
     private final TarefaRepository tarefaRepository;
-
     private final UsuarioRepository usuarioRepository;
+    private final List<ValidadorTarefa> validadores;
 
-    public TarefaService(TarefaRepository tarefaRepository, UsuarioRepository usuarioRepository) {
+    public TarefaService(TarefaRepository tarefaRepository, UsuarioRepository usuarioRepository, List<ValidadorTarefa> validadores) {
         this.tarefaRepository = tarefaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.validadores = validadores;
     }
 
     @Transactional
-    public Tarefa salvarTarefa(@Valid CadastrarTarefaDto dto) {
-        Usuario usuario = usuarioRepository.findById(dto.usuario())
+    public Tarefa salvarTarefa(@Valid CadastrarTarefaDto dtoCadastrar) {
+        validadores.forEach(v -> v.validar(dtoCadastrar, null));
+        Usuario usuario = usuarioRepository.findById(dtoCadastrar.usuario())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        Tarefa tarefa = new Tarefa(dto, usuario);
+        Tarefa tarefa = new Tarefa(dtoCadastrar, usuario);
 
         return tarefaRepository.save(tarefa);
 
